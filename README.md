@@ -1,121 +1,94 @@
 # bt-applications
 
-A FiveM job application script that lets players submit applications for in-game jobs directly through an interactive UI. Submissions are delivered to a Discord channel via webhook as a formatted embed.
-
----
-
-## Features
-
-- Interact with an in-world terminal using `ox_target` to open an application form
-- Dynamically driven by config — add as many job types as you want
-- Responses delivered to Discord as a formatted embed including the player's name, identifier, and timestamp
-- Per-player cooldown to prevent spam submissions
-- Server-side input validation and answer length capping
+A fivem job application script. Players walk up to a terminal, fill out a form and it gets sent to discord. Thats basically it.
 
 ---
 
 ## Dependencies
 
-| Dependency | Link |
-|---|---|
-| [ox_lib](https://github.com/overextended/ox_lib) | UI dialogs and notifications |
-| [ox_target](https://github.com/overextended/ox_target) | In-world interaction zones |
+you need these or it wont work
+
+- [ox_lib](https://github.com/overextended/ox_lib)
+- [ox_target](https://github.com/overextended/ox_target)
 
 ---
 
-## Installation
+## install
 
-1. Download or clone this repository into your server's `resources` folder:
+1. drop the folder into your resources
    ```
-   resources/[scripts]/bt-applications/
+   resources/[scripts]/bt-applications
    ```
 
-2. Add the following to your `server.cfg`:
+2. add to server.cfg
    ```
    ensure bt-applications
    ```
 
-3. Open `config.lua` and configure your jobs (see below).
+3. configure config.lua (see below)
 
 ---
 
 ## Configuration
 
-All configuration is done inside `config.lua`.
+edit config.lua, its pretty self explanatory
 
-### Adding a Job
 
-Each entry inside `Config.Applications` is one job type. Copy and paste the block below for each job you want to add:
+to add a job just copy this and change the values:
 
 ```lua
-Config.Applications = {
-    ["job1"] = {
-        label = "A cool job",           -- Displayed in the UI and Discord embed title
-        questions = {
-            "Question 1",               -- Add or remove questions as needed
-            "Question 2",
-            "Question 3",
-        },
-        location = vector3(0.0, 0.0, 0.0),  -- Coords of the in-world application terminal
-        webhook = "https://discord.com/api/webhooks/your_webhook_id/your_webhook_token"
+["job1"] = {
+    label = "Job Name",
+    questions = {
+        "Question 1",
+        "Question 2",
+        "Question 3",
     },
-}
+    location = vector3(0.0, 0.0, 0.0), -- coords for the terminal
+    webhook = "https://discord.com/api/webhooks/your_webhook_id/your_webhook_token"
+},
 ```
 
-> **Note:** Replace `location` with the actual in-game coordinates and `webhook` with a real Discord webhook URL. Never share your webhook URL publicly.
+**dont share your webhook url**
 
-### Getting a Discord Webhook URL
-
-1. Open your Discord server
-2. Go to **Server Settings > Integrations > Webhooks**
-3. Click **New Webhook**, select the channel, and copy the URL
-4. Paste it into the `webhook` field in `config.lua`
+### getting a webhook url
+1. discord server settings > integrations > webhooks
+2. new webhook, pick your channel, copy the url
+3. paste it in config
 
 ---
 
-## How It Works
+## how it works
 
-### Client (`client.lua`)
-- On resource start, iterates through `Config.Applications` and creates an `ox_target` box zone at each configured location
-- When a player interacts with the zone, an `ox_lib` input dialog is shown with the configured questions
-- On submit, the answers are sent to the server via `application:submit`
+**client** - creates an ox_target zone at the coords you set. player walks up, interacts, fills in the questions and hits submit. sends the answers to the server.
 
-### Server (`server.lua`)
-- Validates that the application exists, answers are the correct type and count, and the player is not on cooldown
-- Sanitises each answer to the configured max length
-- Builds a Discord embed containing the player's name, identifier, all Q&A pairs, and a UTC timestamp
-- Sends the embed to the configured webhook via `PerformHttpRequest`
+**server** - checks the player isnt on cooldown, validates the answers, then builds a discord embed and posts it to the webhook. logs to console if the webhook fails.
 
----
-
-## Discord Embed Preview
+### what the discord embed looks like
 
 ```
-PlayerName - A cool job
-────────────────────────
+PlayerName - Job Name
 Q1: Question 1
-A1: Player's answer
+A1: their answer
 
 Q2: Question 2
-A2: Player's answer
+A2: their answer
 
-ID: license:xxxxxxxxxxxxxxxx    |    2026-04-25T10:00:00Z
+ID: license:xxxxxxxx  |  2026-04-25T10:00:00Z
 ```
 
 ---
 
-## File Structure
+## files
 
 ```
 bt-applications/
-├── fxmanifest.lua   — Resource manifest
-├── config.lua       — All configuration (jobs, questions, webhooks)
-├── client.lua       — Interaction zones and input dialog
-└── server.lua       — Validation, cooldowns, and webhook delivery
+├── fxmanifest.lua
+├── config.lua
+├── client.lua
+└── server.lua
 ```
 
 ---
 
-## License
-
-This resource is free to use and modify for personal or server use.
+free to use, do whatever with it
